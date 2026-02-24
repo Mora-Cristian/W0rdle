@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ParOLè - Wordle IT (Timer & Counter)</title>
+<style>
+  :root{
+    --bg:#121213;
+    --tile:#3a3a3c;
+    --absent:#3a3a3c; /* grigio */
+    --present:#b59f3b; /* giallo */
+    --correct:#538d4e; /* verde */
+    --key:#818384;
+    --key-text:#fff;
+    --text:#e5e5e5;
+    --accent:#5ac8fa;
+  }
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji", "Segoe UI Symbol";
+    display:flex; flex-direction:column; align-items:center;
+  }
+  header{
+    width:100%; max-width:600px; display:flex; align-items:center; justify-content:space-between;
+    padding:10px 12px; box-sizing:border-box; border-bottom:1px solid #2a2a2b;
+  }
+  header h1{font-size:22px; letter-spacing:1px; margin:6px 0}
+  .panel{display:flex; gap:12px; align-items:center}
+  .badge{
+    background:#222; border:1px solid #2a2a2b; padding:6px 10px; border-radius:8px; font-weight:600
+  }
+  .btn{
+    background:#2c2c2e; color:#fff; border:1px solid #3a3a3c; border-radius:8px; padding:8px 12px; cursor:pointer;
+  }
+  .btn:hover{filter:brightness(1.1)}
+  main{width:100%; max-width:600px; padding:10px; box-sizing:border-box}
+  /* Griglia tentativi */
+  #grid{display:flex; flex-direction:column; gap:10px; margin:24px auto}
+  .row{display:grid; grid-template-columns:repeat(5, 1fr); gap:8px}
+  .tile{
+    width:62px; height:62px; border:2px solid #3a3a3c; display:flex; align-items:center; justify-content:center;
+    font-size:28px; font-weight:700; text-transform:uppercase; background:#121213; color:#fff; border-radius:4px;
+  }
+  .tile.filled{border-color:#565758}
+  .tile.reveal{ transition: background 300ms ease, border-color 300ms ease, transform 200ms ease}
+  .tile.absent{background:var(--absent); border-color:var(--absent)}
+  .tile.present{background:var(--present); border-color:var(--present)}
+  .tile.correct{background:var(--correct); border-color:var(--correct)}
+  /* Tastiera */
+  #kb{display:grid; gap:8px; user-select:none}
+  .kb-row{display:flex; gap:8px; justify-content:center}
+  .key{
+    background:var(--key); color:var(--key-text); border:none; border-radius:6px; padding:14px 10px; font-weight:700; cursor:pointer;
+    min-width:36px;
+  }
+  .key.wide{min-width:72px}
+  .key.absent{background:var(--absent)}
+  .key.present{background:var(--present)}
+  .key.correct{background:var(--correct)}
+  /* Messaggi */
+  #toast{
+    position:fixed; top:80px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:10px 14px;
+    border-radius:8px; opacity:0; pointer-events:none; transition:opacity .25s ease;
+  }
+  #toast.show{opacity:0.95}
+  footer{opacity:0.7; font-size:12px; margin:16px}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ParOLè</h1>
+  <div class="panel">
+    <div class="badge">⏱️ <span id="timer">00:00</span></div>
+    <div class="badge">Tentativi: <span id="tries">0</span></div>
+    <button id="newGame" class="btn">Nuova partita</button>
+  </div>
+</header>
+
+<main>
+  <section id="grid"></section>
+  <section id="kb"></section>
+</main>
+
+<div id="toast"></div>
+
+<footer>
+  Ispirato a <a href="https://pietroppeter.github.io/wordle-it/" target="_blank" rel="noopener">wordle‑it</a> / regole Wordle (6 tentativi) su NYT. [4](https://pietroppeter.github.io/wordle-it/)[2](https://www.nytimes.com/games/wordle/index.html)
+</footer>
+
+<script>
+/* =======================
+   DIZIONARIO DEMO (5 lettere, tutto minuscolo)
+   ======================= */
+const WORDS = [
+  "amici","canto","pasta","corsa","verde","acqua","soleo","maree","pieno","corno",
+  "cielo","scuola","notte","volto","piano","ritro","salto","senso","tarda","tigre",
+  "aiuto","audit","denti","pelle","tasto","siero","pieno","ritmo","largo","opera",
+  "primo","santo","stato","visto","treno","porta","donna","uomoa","navee","attua",
+  "pietra","pellea","campo","fiore","libro","miele","sasso","fiume","legno","prato"
+].filter(w => w.length === 5);
+
+/* =======================
+   STATO GIOCO
+   ======================= */
+let secret = "";
+let currentRow = null;
+let currentGuess = "";
+let tries = 0;
+let timerId = null;
+let startTime = null;
+let finished = false;
+
+/* =======================
+   UTILITY UI
+   ======================= */
+const grid = document.getElementById("grid");
+const kb = document.getElementById("kb");
+const triesEl = document.getElementById("tries");
+const timerEl = document.getElementById("timer");
+const toast = document.getElementById("toast");
+
+function showToast(msg, ms=1200){
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(()=> toast.classList.remove("show"), ms); // setTimeout come nel PDF
+}
+
+/* =======================
+   TIMER (parte/stop)
+   ======================= */
+function startTimer(){
+  if(timerId) clearInterval(timerId);
+  startTime = Date.now();
+  timerId = setInterval(()=>{
+    const s = Math.floor((Date.now()-startTime)/1000);
+    const mm = String(Math.floor(s/60)).padStart(2,"0");
+    const ss = String(s%60).padStart(2,"0");
+    timerEl.textContent = `${mm}:${ss}`;
+  }, 1000);
+}
+function stopTimer(){
+  if(timerId){ clearInterval(timerId); timerId=null; }
+}
+
+/* =======================
+   ASINCRONO (Promise) — simula caricamento parola
+   ======================= */
+function caricaParola(){
+  // Promise + setTimeout per simulare una chiamata lenta (coerente con il PDF)
+  return new Promise(resolve=>{
+    setTimeout(()=>{
+      const idx = Math.floor(Math.random()*WORDS.length);
+      resolve(WORDS[idx]);
+    }, 900);
+  });
+}
+
+/* =======================
+   ASINCRONO (Promise) — valida che il tentativo esista nel dizionario
+   ======================= */
+function validaTentativo(word){
+  return new Promise((resolve, reject)=>{
+    setTimeout(()=>{
+      if(WORDS.includes(word.toLowerCase())) resolve(true);
+      else reject(new Error("Parola non valida"));
+    }, 300);
+  });
+}
+
+/* =======================
+   LOGICA COLORI tipo Wordle
+   ======================= */
+function valuta(guess, target){
+  const result = Array(5).fill("absent");
+  const counts = {};
+  // conteggio lettere del target
+  for(const ch of target){
+    counts[ch] = (counts[ch]||0)+1;
+  }
+  // passaggio 1: corretti
+  for(let i=0;i<5;i++){
+    if(guess[i]===target[i]){
+      result[i]="correct";
+      counts[guess[i]]--;
+    }
+  }
+  // passaggio 2: presenti
+  for(let i=0;i<5;i++){
+    if(result[i]==="correct") continue;
+    const ch = guess[i];
+    if(counts[ch]>0){
+      result[i]="present";
+      counts[ch]--;
+    }
+  }
+  return result;
+}
+
+/* =======================
+   UI: crea riga e tastiera
+   ======================= */
+function nuovaRiga(){
+  const row = document.createElement("div");
+  row.className="row";
+  for(let i=0;i<5;i++){
+    const t=document.createElement("div");
+    t.className="tile";
+    row.appendChild(t);
+  }
+  grid.appendChild(row);
+  return row;
+}
+
+function renderKb(){
+  kb.innerHTML="";
+  const rows = [
+    "QWERTYUIOP",
+    "ASDFGHJKL",
+    "↵ZXCVBNM⌫"
+  ];
+  rows.forEach(r=>{
+    const div=document.createElement("div"); div.className="kb-row";
+    for(const ch of r){
+      const b=document.createElement("button");
+      b.className="key";
+      if(ch==="↵" || ch==="⌫") b.classList.add("wide");
+      b.textContent=ch;
+      b.onclick=()=> onKey(ch);
+      div.appendChild(b);
+    }
+    kb.appendChild(div);
+  });
+}
+
+function paintKb(letter, state){
+  const btn = [...document.querySelectorAll(".key")].find(k=>k.textContent===letter.toUpperCase());
+  if(!btn) return;
+  const priorities = {absent:0,present:1,correct:2};
+  const current = btn.dataset.state || "none";
+  if(current==="correct") return;
+  if(priorities[state] > priorities[current] || current==="none"){
+    btn.dataset.state=state;
+    btn.classList.remove("absent","present","correct");
+    btn.classList.add(state);
+  }
+}
+
+/* =======================
+   GESTIONE INPUT
+   ======================= */
+function onKey(ch){
+  if(finished) return;
+  if(!currentRow) currentRow = nuovaRiga();
+
+  if(/^[A-Z]$/.test(ch)){
+    if(currentGuess.length<5){
+      currentGuess += ch.toLowerCase();
+      const tiles = currentRow.querySelectorAll(".tile");
+      tiles[currentGuess.length-1].textContent = ch;
+      tiles[currentGuess.length-1].classList.add("filled");
+    }
+    if(!timerId) startTimer();
+  } else if(ch==="⌫"){
+    if(currentGuess.length>0){
+      const tiles = currentRow.querySelectorAll(".tile");
+      tiles[currentGuess.length-1].textContent="";
+      tiles[currentGuess.length-1].classList.remove("filled");
+      currentGuess = currentGuess.slice(0,-1);
+    }
+  } else if(ch==="↵"){
+    submitGuess();
+  }
+}
+
+document.addEventListener("keydown", (e)=>{
+  if(e.key==="Enter") onKey("↵");
+  else if(e.key==="Backspace") onKey("⌫");
+  else if(/^[a-zA-Z]$/.test(e.key)) onKey(e.key.toUpperCase());
+});
+
+/* =======================
+   SUBMIT (async/await + Promise + then/catch)
+   ======================= */
+async function submitGuess(){
+  if(finished) return;
+  if(!currentRow || currentGuess.length!==5){ showToast("Servono 5 lettere"); return; }
+
+  try{
+    await validaTentativo(currentGuess); // Promise (resolve/reject)
+  }catch(err){
+    showToast(err.message);
+    return;
+  }
+
+  const res = valuta(currentGuess, secret);
+  const tiles = currentRow.querySelectorAll(".tile");
+
+  // Animazione di rivelazione simulando latenza con setTimeout (PDF)
+  res.forEach((st, i)=>{
+    setTimeout(()=>{
+      tiles[i].classList.add("reveal", st);
+      paintKb(currentGuess[i].toUpperCase(), st);
+    }, i*180);
+  });
+
+  tries++; triesEl.textContent = tries;
+
+  if(currentGuess===secret){
+    finished = true;
+    setTimeout(()=>{
+      stopTimer();
+      showToast(`Bravo! Hai indovinato in ${tries} tentativi, tempo ${timerEl.textContent}`);
+    }, 950);
+  }else{
+    // prepara una nuova riga dopo breve pausa
+    setTimeout(()=>{
+      currentRow = nuovaRiga();
+      currentGuess = "";
+    }, 950);
+  }
+}
+
+/* =======================
+   NUOVA PARTITA (async) — coordina con await (PDF)
+   ======================= */
+async function startGame(){
+  stopTimer();
+  grid.innerHTML=""; kb.innerHTML=""; renderKb();
+  tries = 0; triesEl.textContent = "0";
+  timerEl.textContent="00:00";
+  finished = false; currentGuess=""; currentRow=null;
+
+  // carica parola con Promise e attesa (PDF)
+  secret = await caricaParola();
+  // Debug: console.log("Segreta:", secret);
+}
+
+document.getElementById("newGame").addEventListener("click", startGame);
+
+// Avvio iniziale
+startGame();
+</script>
+</body>
+</html>
