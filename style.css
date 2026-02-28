@@ -6,7 +6,7 @@ html{
     height: 10vh;
     width: 10vh;
     text-align: center;
-    font-size: 45px;
+    font-size: 5vh;
     border-radius: 10%;
     border: 0;
     margin: 1%;
@@ -18,26 +18,10 @@ body{
     text-align: center;    
 }
 
-.classeGialla{
-     height: 10vh;
-    width: 10vh;
-    text-align: center;
-    font-size: 45px;
-    border-radius: 10%;
-    border: 0;
-    margin: 1%;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+.classeGialla {
     background-color: rgb(243, 243, 146);
 }
 
-.classeVerde{
-     height: 10vh;
-    width: 10vh;
-    text-align: center;
-    font-size: 45px;
-    border-radius: 10%;
-    border: 0;
-    margin: 1%;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+.classeVerde {
     background-color: rgb(144, 218, 144);
 }

@@ -19,4 +19,4 @@ def filtra_parole_5_lettere(file_input, file_output):
     print(f"Salvate in {file_output}")
 
 # Uso
-filtra_parole_5_lettere('word_list.txt', '5lettere.json')
+filtra_parole_5_lettere('scriptFileJson\word_list.txt', '5lettere.json')

@@ -29,15 +29,30 @@ function controlloParola(parolaInput, parolaDaindovinare) {
 
 //funzione controllo caselle:
 function controlloCaselle(listaCelle, parolaDaindovinare) {
+    listaSegreta = [];
+    for (let i = 0; i < parolaDaindovinare.length; i++) {
+        listaSegreta.push(parolaDaindovinare[i]);
+    };
+
+    //caselle verdi:
     listaCelle.forEach((element, index) => {
-        if (element.value.toLowerCase() == parolaDaindovinare[index]) {
-            element.classList.add("classeVerde")
-        } else {
-            if (parolaDaindovinare.includes(element.value.toLowerCase())) {
-                element.classList.add("classeGialla")
+        if (element.value.toLowerCase() == listaSegreta[index]) {
+            element.classList.add("classeVerde");
+            listaSegreta[index] = null;
+        }
+    });
+
+    //caselle gialle:
+    listaCelle.forEach((element) => {
+        if (!element.classList.contains("classeVerde")) {
+            //indexOf ritorna l'indice se è presente altrimenti -1
+            let pos = listaSegreta.indexOf(element.value.toLowerCase());  
+
+            if (pos !== -1) {  
+                element.classList.add("classeGialla");
             }
         }
-    })
+})
 }
 
 //funzione aggiungi caselle:
@@ -111,7 +126,7 @@ scaricoDati("/5lettere.json").then(() => {
                 parola += cella.value;
             });
             if (parola.length == 5) {
-                if (listaSoluzioni.includes(parola.includes)){
+                if (listaSoluzioni.includes(parola.toLowerCase())) {
                     if (controlloParola(parola, parolaSegreta)) {
                         alert("Hai vinto! premi ok per fare una nuova partita!!");
                         setTimeout(() => {
@@ -122,8 +137,6 @@ scaricoDati("/5lettere.json").then(() => {
                         setTimeout(() => {
                             aggiungiRiga();
                         }, 1000);
-                        parola = "";
-
                     }
                 } else {
                     alert("Non esiste questa parola!")
