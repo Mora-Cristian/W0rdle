@@ -2,18 +2,42 @@ html{
     font-family: 'Times New Roman', Times, serif;
 }
 
-.cella{
+.cella {
     height: 10vh;
     width: 10vh;
     text-align: center;
     font-size: 45px;
     border-radius: 10%;
     border: 0;
-    margin-right: 1vw;
+    margin: 1%;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 body{
     background-color: rgb(243, 245, 244);
     text-align: center;    
+}
+
+.classeGialla{
+     height: 10vh;
+    width: 10vh;
+    text-align: center;
+    font-size: 45px;
+    border-radius: 10%;
+    border: 0;
+    margin: 1%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    background-color: rgb(243, 243, 146);
+}
+
+.classeVerde{
+     height: 10vh;
+    width: 10vh;
+    text-align: center;
+    font-size: 45px;
+    border-radius: 10%;
+    border: 0;
+    margin: 1%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    background-color: rgb(144, 218, 144);
 }
