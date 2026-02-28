@@ -1,64 +1,19 @@
-* {
-    margin: 0;
-    padding: 0;
+html{
+    font-family: 'Times New Roman', Times, serif;
 }
 
-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #1a1a2e;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 20px;
-}
-
-h1 {
-    color: #fff;
-    font-size: 2.5rem;
-    letter-spacing: 5px;
-    margin-bottom: 50px;
+.cella{
+    height: 10vh;
+    width: 10vh;
     text-align: center;
+    font-size: 45px;
+    border-radius: 10%;
+    border: 0;
+    margin-right: 1vw;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
-.contenitore {
-    display: flex;
-    gap: 20px;
-}
-
-.numero {
-    width: 20vh;
-    height: 20vh;
-    background: #7bb68f;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    font-weight: bold;
-    color: #fff;
-    cursor: pointer;
-    border: 2px solid #ffffff;
-    transition: all 0.3s ease;
-}
-
-.numero:hover {
-    background: #bebebe;
-    transform: translateY(-5px);
-}
-
-@media (max-width: 600px) {
-    h1 {
-        font-size: 1.5rem;
-    }
-    
-    .numero {
-        width: 60px;
-        height: 60px;
-        font-size: 1.2rem;
-    }
-    
-    .contenitore {
-        gap: 10px;
-    }
+body{
+    background-color: rgb(243, 245, 244);
+    text-align: center;    
 }
