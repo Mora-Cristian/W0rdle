@@ -47,9 +47,10 @@ function controlloCaselle(listaCelle, parolaDaindovinare) {
         if (!element.classList.contains("classeVerde")) {
             //indexOf ritorna l'indice se è presente altrimenti -1
             let pos = listaSegreta.indexOf(element.value.toLowerCase());  
-
+            
             if (pos !== -1) {  
                 element.classList.add("classeGialla");
+                listaSegreta[pos] = null;
             }
         }
 })
@@ -103,7 +104,6 @@ scaricoDati("/5lettere.json").then(() => {
     id = "#cella" + contatore;
     creaParolaSegreta(listaSoluzioni)
     console.log(parolaSegreta)
-    let parola = '';
     listaCelle = document.querySelectorAll(id);
     //QUANDO SCRIVO PASSO ALLA RIGA SUCCESSIVA
     listaCelle.forEach((input, index, array) => {
@@ -128,10 +128,11 @@ scaricoDati("/5lettere.json").then(() => {
             if (parola.length == 5) {
                 if (listaSoluzioni.includes(parola.toLowerCase())) {
                     if (controlloParola(parola, parolaSegreta)) {
-                        alert("Hai vinto! premi ok per fare una nuova partita!!");
+                        controlloCaselle(listaCelle, parolaSegreta);
                         setTimeout(() => {
+                            alert("Hai vinto! premi ok per fare una nuova partita!!");
                             location.reload();
-                        }, 1000);
+                        }, 1500);
                     } else {
                         controlloCaselle(listaCelle, parolaSegreta);
                         setTimeout(() => {

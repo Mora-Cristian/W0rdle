@@ -1,7 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap');
+
 html{
-    font-family: 'Times New Roman', Times, serif;
+    font-family: "Alfa Slab One", serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
+hr {
+    align-items: center;
+    width: 30vw;
+    margin-bottom:  3vh;
+}
+
+h1{
+    margin: 0;
+    font-size: 8vh; 
+}
 .cella {
     height: 10vh;
     width: 10vh;
@@ -9,7 +23,7 @@ html{
     font-size: 5vh;
     border-radius: 10%;
     border: 0;
-    margin: 1%;
+    margin: 0.5%;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
