@@ -1,6 +1,7 @@
 let listaSoluzioni;
 let parolaSegreta;
-let contatore = 0;
+let contatore = 0;4
+
 async function scaricoDati(file) {
     await fetch(file)
         .then(response => response.json())
@@ -150,7 +151,6 @@ scaricoDati("/5lettere.json").then(() => {
     });
 });
 
-//PAROLA INSERITA:
 
 
 
