@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap');
 
 html{
-    font-family: "Alfa Slab One", serif;
   font-weight: 400;
   font-style: normal;
 }
@@ -13,30 +12,82 @@ hr {
 }
 
 h1{
+    font-family: "Alfa Slab One", serif;
     margin: 0;
     letter-spacing: 0.4vw;
     font-size: 8vh; 
 }
 .cella {
-    height: 10vh;
-    width: 10vh;
+    height: 7vh;
+    width: 7vh;
     text-align: center;
-    font-size: 5vh;
+    font-size: 3vh;
     border-radius: 10%;
     border: 0;
-    margin: 0.5%;
+    margin: 0.3vh;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 body{
     background-color: rgb(243, 245, 244);
-    text-align: center;    
+    text-align: center; 
 }
 
-.classeGialla {
+.cella.classeGialla {
     background-color: rgb(243, 243, 146);
 }
 
-.classeVerde {
+.cella.classeVerde {
     background-color: rgb(144, 218, 144);
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 2vh 0;
+    background-color: rgb(243, 245, 244);
+    padding-bottom: 5vh;
+}
+
+#tastiera {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5vh;
+}
+
+.riga-tastiera {
+    display: flex;
+    gap: 0.5vh;
+}
+
+.tasto {
+    height: 8vh;
+    width: 6vh;
+    border: none;
+    border-radius: 10%;
+    background-color: rgb(243, 241, 241);
+    border: 0.1px solid rgb(181, 181, 181);
+    font-size: 2vh;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.tasto:hover {
+    background-color: #ddd9d9;
+}
+
+.tasto.verde {
+    background-color: rgb(144, 218, 144);
+    color: white;
+}
+
+.tasto.giallo {
+    background-color: rgb(243, 243, 146);
+}
+
+.tasto.grigio {
+    background-color: #afb3b8;
+    color: white;
 }
