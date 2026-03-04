@@ -179,10 +179,14 @@ function cancellaLettera() {
 
 function aggiornaTastiera(lettera, colore) {
     const tasto = document.getElementById('tasto-' + lettera.toUpperCase());
-    if (tasto.classList.contains('verde') || tasto.classList.contains('giallo') || tasto.classList.contains('grigio'))
+    if (tasto.classList.contains('verde') || tasto.classList.contains('grigio'))
         return;
+
     if (tasto) {
         if (colore === 'verde') {
+            if (tasto.classList.contains('giallo')){
+                tasto.classList.remove('giallo');
+            }
             tasto.classList.add('verde');
         } else if (colore === 'giallo') {
             tasto.classList.add('giallo');
