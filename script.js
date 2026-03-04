@@ -3,6 +3,7 @@ let parolaSegreta;
 let contatore = 0;
 
 async function scaricoDati(file) {
+    listaSoluzioni = []
     await fetch(file)
         .then(response => response.json())
         .then(data => {
@@ -13,7 +14,7 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-//
+
 //FUNZIONE PAROLA SEGRETA:
 function creaParolaSegreta(lista) {
     nRandom = randomInt(0, lista.length - 1);
@@ -184,7 +185,7 @@ function aggiornaTastiera(lettera, colore) {
 
     if (tasto) {
         if (colore === 'verde') {
-            if (tasto.classList.contains('giallo')){
+            if (tasto.classList.contains('giallo')) {
                 tasto.classList.remove('giallo');
             }
             tasto.classList.add('verde');
@@ -198,61 +199,65 @@ function aggiornaTastiera(lettera, colore) {
 
 //FUNZIONE INIZIALE: scarico tutto il json su una variabile e poi INIZIO CON IL RESTO DEL PROGRAMMA
 
-scaricoDati("/5lettere.json").then(() => {
-    creaTastiera();
-    aggiungiRiga();
-    id = "#cella" + contatore;
-    creaParolaSegreta(listaSoluzioni)
-    console.log(parolaSegreta)
-    listaCelle = document.querySelectorAll(id);
-    //QUANDO SCRIVO PASSO ALLA RIGA SUCCESSIVA
-    listaCelle.forEach((input, index, array) => {
-        input.addEventListener('input', () => {
-            if (input.value.length === 1 && index < array.length - 1) {
-                array[index + 1].focus(); // passa alla cella successiva
-            }
-        });
-        input.addEventListener('keydown', (event) => {
-            if (event.key === 'Backspace' && input.value === '' && index > 0) {
-                array[index - 1].focus();
-            }
-        });
-    });
-    document.addEventListener('keydown', async (event) => {
-        if (event.key === 'Enter') {
-            let parola = "";
-            listaCelle.forEach((cella) => {
-                parola += cella.value;
+scaricoDati("/paroleComuni.json").then(() => {
+    const listaParolePossibiliSoluzioni = listaSoluzioni;
+    scaricoDati("/5lettere.json").then(() => {
+        creaTastiera();
+        aggiungiRiga();
+        id = "#cella" + contatore;
+        creaParolaSegreta(listaParolePossibiliSoluzioni);
+        console.log(parolaSegreta);
+        listaCelle = document.querySelectorAll(id);
+        //QUANDO SCRIVO PASSO ALLA RIGA SUCCESSIVA
+        listaCelle.forEach((input, index, array) => {
+            input.addEventListener('input', () => {
+                if (input.value.length === 1 && index < array.length - 1) {
+                    array[index + 1].focus(); // passa alla cella successiva
+                }
             });
-            if (parola.length == 5) {
-                if (listaSoluzioni.includes(parola.toLowerCase())) {
-                    if (controlloParola(parola, parolaSegreta)) {
-                        controlloCaselle(listaCelle, parolaSegreta);
-                        setTimeout(() => {
-                            alert("Hai vinto! premi ok per fare una nuova partita!!");
-                            location.reload();
-                        }, 1500);
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Backspace' && input.value === '' && index > 0) {
+                    array[index - 1].focus();
+                }
+            });
+        });
+        document.addEventListener('keydown', async (event) => {
+            if (event.key === 'Enter') {
+                let parola = "";
+                listaCelle.forEach((cella) => {
+                    parola += cella.value;
+                });
+                if (parola.length == 5) {
+                    if (listaSoluzioni.includes(parola.toLowerCase())) {
+                        if (controlloParola(parola, parolaSegreta)) {
+                            controlloCaselle(listaCelle, parolaSegreta);
+                            setTimeout(() => {
+                                alert("Hai vinto! premi ok per fare una nuova partita!!");
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            controlloCaselle(listaCelle, parolaSegreta);
+                            await aspetta(500);
+                            await aggiungiRiga();
+
+                        }
                     } else {
-                        controlloCaselle(listaCelle, parolaSegreta);
-                        await aspetta(500);
-                        await aggiungiRiga();
-
+                        alert("Non esiste questa parola!")
                     }
-                } else {
-                    alert("Non esiste questa parola!")
+
+                    if (contatore == 6) {
+                        alert("Hai perso: la parola segreta era " + parolaSegreta);
+                        location.reload();
+                    }
+                }
+                else {
+                    alert("Inserisci 5 lettere!");
                 }
 
-                if (contatore == 6){
-                    alert("Hai perso: la parola segreta era " + parolaSegreta);
-                    location.reload();
-                }
             }
-            else {
-                alert("Inserisci 5 lettere!");
-            }
+        });
+    })
 
-        }
-    });
 });
 
 
