@@ -258,7 +258,6 @@ scaricoDati("/paroleComuni.json").then(() => {
     })
 
 });
-
 // -------------------------------------
 const logoutBtn = document.getElementById("logout");
 logoutBtn.addEventListener("click", () => {

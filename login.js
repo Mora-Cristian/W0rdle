@@ -10,7 +10,6 @@ bottone.addEventListener("click", () => {
         return;
     }
     risultato.textContent = "Accesso in corso...";
-
     setTimeout(() => {
         window.location.href = "main.html";
     }, 800);
