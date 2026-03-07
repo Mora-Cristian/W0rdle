@@ -198,7 +198,6 @@ function aggiornaTastiera(lettera, colore) {
 }
 
 //FUNZIONE INIZIALE: scarico tutto il json su una variabile e poi INIZIO CON IL RESTO DEL PROGRAMMA
-
 scaricoDati("/paroleComuni.json").then(() => {
     const listaParolePossibiliSoluzioni = listaSoluzioni;
     scaricoDati("/5lettere.json").then(() => {
@@ -260,7 +259,14 @@ scaricoDati("/paroleComuni.json").then(() => {
 
 });
 
-
-
+// -------------------------------------
+const logoutBtn = document.getElementById("logout");
+logoutBtn.addEventListener("click", () => {
+    logoutBtn.textContent = "Disconnessione...";
+    
+    setTimeout(() => {
+        window.location.href = "login.html";
+    }, 500);
+});
 
 
