@@ -1,6 +1,9 @@
 let listaSoluzioni;
 let parolaSegreta;
 let contatore = 0;
+let tentativiRimasti = 5;
+
+const tentativiText = document.getElementById("tentativi");
 
 async function scaricoDati(file) {
     listaSoluzioni = []
@@ -17,7 +20,7 @@ function randomInt(min, max) {
 
 //FUNZIONE PAROLA SEGRETA:
 function creaParolaSegreta(lista) {
-    nRandom = randomInt(0, lista.length - 1);
+    let nRandom = randomInt(0, lista.length - 1);
     parolaSegreta = lista[nRandom];
 }
 
@@ -36,7 +39,7 @@ function aspetta(ms) {
 
 //funzione controllo caselle:
 function controlloCaselle(listaCelle, parolaDaindovinare) {
-    listaSegreta = [];
+    let listaSegreta = [];
     for (let i = 0; i < parolaDaindovinare.length; i++) {
         listaSegreta.push(parolaDaindovinare[i]);
     };
@@ -93,6 +96,10 @@ function aggiungiRiga() {
     const nuoveCelle = nuovaRiga.querySelectorAll(id);
     nuoveCelle.forEach((input, index, array) => {
         input.addEventListener('input', () => {
+
+            input.classList.add("cella-zoom");
+            setTimeout(() => input.classList.remove("cella-zoom"), 120);
+            
             if (input.value.length === 1 && index < array.length - 1) {
                 array[index + 1].focus();
             }
@@ -210,6 +217,10 @@ scaricoDati("/paroleComuni.json").then(() => {
         //QUANDO SCRIVO PASSO ALLA RIGA SUCCESSIVA
         listaCelle.forEach((input, index, array) => {
             input.addEventListener('input', () => {
+
+                input.classList.add("cella-zoom");
+                setTimeout(() => input.classList.remove("cella-zoom"), 120);
+
                 if (input.value.length === 1 && index < array.length - 1) {
                     array[index + 1].focus(); // passa alla cella successiva
                 }
@@ -231,12 +242,14 @@ scaricoDati("/paroleComuni.json").then(() => {
                         if (controlloParola(parola, parolaSegreta)) {
                             controlloCaselle(listaCelle, parolaSegreta);
                             setTimeout(() => {
-                                alert("Hai vinto! premi ok per fare una nuova partita!!");
+                                alert("Hai vinto! Premi ok per fare una nuova partita!");
                                 location.reload();
                             }, 1500);
                         } else {
                             controlloCaselle(listaCelle, parolaSegreta);
                             await aspetta(500);
+                            tentativiRimasti--;
+                            tentativiText.textContent = "TENTATIVI RIMASTI: " + tentativiRimasti;
                             await aggiungiRiga();
 
                         }
@@ -244,7 +257,7 @@ scaricoDati("/paroleComuni.json").then(() => {
                         alert("Non esiste questa parola!")
                     }
 
-                    if (contatore == 6) {
+                    if (tentativiRimasti == 0) {
                         alert("Hai perso: la parola segreta era " + parolaSegreta);
                         location.reload();
                     }
@@ -259,7 +272,12 @@ scaricoDati("/paroleComuni.json").then(() => {
 
 });
 // -------------------------------------
+const username = window.location.href.split("user=")[1];
+
 const logoutBtn = document.getElementById("logout");
+const p = document.getElementById("username");
+p.textContent = username;
+
 logoutBtn.addEventListener("click", () => {
     logoutBtn.textContent = "Disconnessione...";
     
