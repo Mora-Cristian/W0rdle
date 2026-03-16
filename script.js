@@ -271,6 +271,7 @@ scaricoDati("/paroleComuni.json").then(() => {
 
 });
 // -------------------------------------
+// PARTE LOGIN
 const username = window.location.href.split("user=")[1];
 
 const logoutBtn = document.getElementById("logout");
