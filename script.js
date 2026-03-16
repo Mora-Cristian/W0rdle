@@ -251,7 +251,6 @@ scaricoDati("/paroleComuni.json").then(() => {
                             tentativiRimasti--;
                             tentativiText.textContent = "TENTATIVI RIMASTI: " + tentativiRimasti;
                             await aggiungiRiga();
-
                         }
                     } else {
                         alert("Non esiste questa parola!")

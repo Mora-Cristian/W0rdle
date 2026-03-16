@@ -60,5 +60,6 @@ for elemento in paroleSegreteIniziali:
     if elemento not in paroleVerbi:
         paroleSegreteFinali.append(elemento)
 
+
 with open("paroleComuni.json", "w") as file:
     json.dump(paroleSegreteFinali, file, indent=4)
